@@ -1,0 +1,13 @@
+target
+.idea
+*.iml
+.idea_modules
+*.log
+dist
+.cache
+.classpath
+.project
+.worksheet
+.ensime
+.ensime_cache
+.settings
