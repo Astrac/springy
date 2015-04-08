@@ -4,7 +4,6 @@ import astrac.springy._
 import astrac.springy.api._
 import scala.language.higherKinds
 import org.elasticsearch.action.index.{ IndexResponse => EsIndexResponse }
-import org.elasticsearch.action.ActionListener
 import scalaz.Applicative
 
 trait IndexSupport {
@@ -24,7 +23,7 @@ trait IndexSupport {
     }
   }
 
-  implicit def toIndexExecutable[T: Writeable] = new IndexExecutable[T]
+  implicit def indexSupport[T: Writeable]: Executable[Executor.JavaApi, IndexRequest[T], IndexResponse] = new IndexExecutable[T]
 }
 
 trait GetDocumentSupport {
@@ -45,7 +44,7 @@ trait GetDocumentSupport {
     }
   }
 
-  implicit def toGetDocumentExecutable[T: Readable] = new GetDocumentExecutable[T]
+  implicit def getSupport[T: Readable]: Executable[Executor.JavaApi, GetRequest[T], GetResponse[T]] = new GetDocumentExecutable[T]
 }
 
 trait UpdateDocumentSupport {
@@ -62,13 +61,13 @@ trait UpdateDocumentSupport {
         UpdateResponse(r.getIndex(), r.getType(), r.getId(), r.getVersion())
       }
     }
-
-    implicit def toUpdateDocumentExecutable[T: Writeable] = new DocumentUpdateExecutable[T]
   }
+
+  implicit def documentUpdateSupport[T: Writeable]: Executable[Executor.JavaApi, DocumentUpdateRequest[T], UpdateResponse] = new DocumentUpdateExecutable[T]
 }
 
 trait DeleteDocumentSupport {
-  implicit object DeleteExecutable extends Executable[Executor.JavaApi, DeleteRequest, DeleteResponse] {
+  implicit val deleteSupport = new Executable[Executor.JavaApi, DeleteRequest, DeleteResponse] {
     def perform[M[_]: Applicative](executor: Executor.JavaApi, request: DeleteRequest): M[DeleteResponse] = {
       val result = executor
         .client
@@ -84,15 +83,11 @@ trait DeleteDocumentSupport {
   }
 }
 
-object DocumentApiSupport
-    extends Document[Executor.JavaApi]
-    with IndexSupport
-    with GetDocumentSupport
-    with UpdateDocumentSupport
-    with DeleteDocumentSupport {
+trait DocumentApiSupport
+  extends Document[Executor.JavaApi]
+  with IndexSupport
+  with GetDocumentSupport
+  with UpdateDocumentSupport
+  with DeleteDocumentSupport
 
-  implicit def deleteSupport = DeleteExecutable
-  implicit def documentUpdateSupport[T: Writeable]: Executable[Executor.JavaApi, DocumentUpdateRequest[T], UpdateResponse] = new DocumentUpdateExecutable[T]
-  implicit def getSupport[T: Readable]: Executable[Executor.JavaApi, GetRequest[T], GetResponse[T]] = new GetDocumentExecutable[T]
-  implicit def indexSuport[T: Writeable]: Executable[Executor.JavaApi, IndexRequest[T], IndexResponse] = new IndexExecutable[T]
-}
+object DocumentApiSupport extends DocumentApiSupport

@@ -17,8 +17,26 @@ case class DeleteRequest(index: String, `type`: String, id: String)
 case class DeleteResponse(_index: String, _type: String, _id: String, _version: Long, found: Boolean)
 
 trait Document[E <: Executor] {
-  implicit def indexSuport[T: Writeable]: Executable[E, IndexRequest[T], IndexResponse]
+  implicit def indexSupport[T: Writeable]: Executable[E, IndexRequest[T], IndexResponse]
   implicit def getSupport[T: Readable]: Executable[E, GetRequest[T], GetResponse[T]]
   implicit def documentUpdateSupport[T: Writeable]: Executable[E, DocumentUpdateRequest[T], UpdateResponse]
   implicit def deleteSupport: Executable[E, DeleteRequest, DeleteResponse]
+}
+
+
+// Search API
+sealed trait Query
+object Query {
+  case class Term[T](field: String, value: T) extends Query
+  case object MatchAll extends Query
+}
+
+case class SearchRequest[T](index: String, `type`: String, query: Query)
+case class ShardInfo(total: Int, successful: Int, failed: Int)
+case class SearchHit[T](_index: String, _type: String, _id: String, _source: T)
+case class SearchHits[T](total: Long, hits: List[SearchHit[T]])
+case class SearchResponse[T](_shard: ShardInfo, hits: SearchHits[T])
+
+trait Search[E <: Executor] {
+  implicit def searchSupport[T: Readable]: Executable[E, SearchRequest[T], SearchResponse[T]]
 }
