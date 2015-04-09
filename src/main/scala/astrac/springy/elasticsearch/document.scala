@@ -53,6 +53,7 @@ trait UpdateDocumentSupport {
       val result = executor
         .client
         .prepareUpdate(request.index, request.`type`, request.id)
+        .setDoc(implicitly[Writeable[T]].toBytes(request.document))
         .execute()
 
       implicitly[Applicative[M]].point {

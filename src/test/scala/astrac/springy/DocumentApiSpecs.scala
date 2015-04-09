@@ -1,7 +1,7 @@
 package astrac.springy
 
 import api._
-import elasticsearch._
+import elasticsearch.DocumentApiSupport._
 import SprayJsonSerialization._
 import org.scalatest.{ FlatSpec, Matchers }
 import scalaz._
@@ -27,4 +27,30 @@ class DocumentApiSpecs extends FlatSpec with ElasticsearchSpec with Protocol wit
     getResp.document shouldEqual Some(Fixtures.sirensOfTitan)
   }
 
+  it should "allow indexing and deleting a document" in {
+    val idxResp = executor.execute(IndexRequest("es_test", "book", None, Fixtures.sirensOfTitan)).to[Id]
+
+    val delResp = executor.execute(DeleteRequest("es_test", "book", idxResp._id)).to[Id]
+
+    delResp.found shouldBe true
+    delResp._id shouldEqual idxResp._id
+    delResp._index shouldEqual "es_test"
+    delResp._type shouldEqual "book"
+
+    val getResp = executor.execute(GetRequest[Book]("es_test", "book", delResp._id)).to[Id]
+
+    getResp.found shouldBe false
+    getResp.document shouldBe None
+  }
+
+  it should "allow indexing and updating a document" in {
+    val idxResp = executor.execute(IndexRequest("es_test", "book", None, Fixtures.sirensOfTitan)).to[Id]
+
+    val updResp = executor.execute(DocumentUpdateRequest("es_test", "book", idxResp._id, Fixtures.protocolsOfTralfamadore)).to[Id]
+
+    updResp._id shouldEqual idxResp._id
+    updResp._index shouldEqual "es_test"
+    updResp._type shouldEqual "book"
+    updResp._version shouldEqual 2
+  }
 }
