@@ -1,6 +1,7 @@
 package astrac.springy
 
 import java.nio.file.Files
+import org.apache.commons.io.FileUtils
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.Requests
 import org.elasticsearch.common.Priority
@@ -44,7 +45,7 @@ class EmbeddedElasticsearch(port: Int) {
   def stop(): Unit = {
     node.close()
 
-    Files.delete(dataDir.toPath())
+    FileUtils.deleteDirectory(dataDir)
   }
 
   def createAndWaitForIndex(index: String): Unit = {

@@ -15,6 +15,7 @@ lazy val springy = project.in(file(".")).settings(
     "io.spray" %% "spray-json" % "1.3.1",
     "org.scalaz" %% "scalaz-core" % "7.1.1",
     "org.scalaz" %% "scalaz-effect" % "7.1.1",
-    "org.scalatest" %% "scalatest"     % "2.2.1" % Test
+    "org.scalatest" %% "scalatest"     % "2.2.1" % Test,
+    "org.apache.commons" % "commons-io" % "1.3.2" % Test
   )
 )

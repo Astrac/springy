@@ -23,7 +23,6 @@ trait Document[E <: Executor] {
   implicit def deleteSupport: Executable[E, DeleteRequest, DeleteResponse]
 }
 
-
 // Search API
 sealed trait Query
 object Query {
