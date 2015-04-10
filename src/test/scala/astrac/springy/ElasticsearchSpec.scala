@@ -18,6 +18,8 @@ trait ElasticsearchSpec extends Assertions with AsyncAssertions with ScalaFuture
   var es: EmbeddedElasticsearch = _
   var executor: Executor.JavaApi = _
 
+  def commitEs() = es.client.admin.indices.prepareRefresh().execute.actionGet
+
   override def beforeAll() {
     super.beforeAll()
     es = new EmbeddedElasticsearch(esPort)

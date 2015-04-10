@@ -11,14 +11,15 @@ trait SearchSupport {
   class SearchExecutable[T: Readable] extends Executable[Executor.JavaApi, SearchRequest[T], SearchResponse[T]] {
 
     def queryFor(q: Query): QueryBuilder = q match {
-      case Query.MatchAll => QueryBuilders.matchAllQuery()
+      case Query.MatchAll   => QueryBuilders.matchAllQuery()
       case Query.Term(f, v) => QueryBuilders.termQuery(f, v)
     }
 
     def perform[M[_]: Applicative](executor: Executor.JavaApi, request: SearchRequest[T]): M[SearchResponse[T]] = {
       val result = executor
         .client
-        .prepareSearch(request.index, request.`type`)
+        .prepareSearch(request.index)
+        .setTypes(request.`type`)
         .setQuery(queryFor(request.query))
         .execute()
 
@@ -34,7 +35,13 @@ trait SearchSupport {
           ),
           SearchHits(
             hits.getTotalHits(),
-            hits.getHits().map(h => ???.asInstanceOf[SearchHit[T]]).toList
+            hits.getHits().map { h =>
+              SearchHit(
+                h.getIndex(),
+                h.getType(),
+                h.getId(),
+                implicitly[Readable[T]].fromBytes(h.getSourceRef().array()))
+            }.toList
           )
         )
       }
@@ -45,3 +52,5 @@ trait SearchSupport {
 }
 
 trait SearchApiSupport extends Search[Executor.JavaApi] with SearchSupport
+
+object SearchApiSupport extends SearchApiSupport
