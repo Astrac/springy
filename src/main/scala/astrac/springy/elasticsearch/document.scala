@@ -2,22 +2,48 @@ package astrac.springy.elasticsearch
 
 import astrac.springy._
 import astrac.springy.api._
+import org.elasticsearch.action.WriteConsistencyLevel
+import org.elasticsearch.common.unit.TimeValue
 import scala.language.higherKinds
 import org.elasticsearch.action.index.{ IndexResponse => EsIndexResponse }
+import org.elasticsearch.action.index.{ IndexRequest => EsIndexRequest }
+import org.elasticsearch.index.{ VersionType => EsVersionType }
 import scalaz.Applicative
 
 trait IndexSupport {
   class IndexExecutable[T: Writeable] extends Executable[Executor.JavaApi, IndexRequest[T], IndexResponse] {
 
     def perform[M[_]: Applicative](executor: Executor.JavaApi, request: IndexRequest[T]): M[IndexResponse] = {
-      val result = executor
+      val ex = executor
         .client
         .prepareIndex(request.index, request.`type`, request.id.orNull)
         .setSource(implicitly[Writeable[T]].toBytes(request.document))
-        .execute()
+
+      request.ttl.foreach(ex.setTTL)
+      request.opType.foreach {
+        case OpType.Index => ex.setOpType(EsIndexRequest.OpType.INDEX)
+        case OpType.Create => ex.setOpType(EsIndexRequest.OpType.CREATE)
+      }
+      request.parent.foreach(ex.setParent)
+      request.refresh.foreach(ex.setRefresh)
+      request.routing.foreach(ex.setRouting)
+      request.timestamp.foreach(ex.setTimestamp)
+      request.version.foreach(ex.setVersion)
+      request.versionType.foreach {
+        case VersionType.Internal => ex.setVersionType(EsVersionType.INTERNAL)
+        case VersionType.External=> ex.setVersionType(EsVersionType.EXTERNAL)
+        case VersionType.ExternalGte => ex.setVersionType(EsVersionType.EXTERNAL_GTE)
+        case VersionType.Force => ex.setVersionType(EsVersionType.FORCE)
+      }
+      request.consistencyLevel.foreach {
+        case ConsistencyLevel.One => ex.setConsistencyLevel(WriteConsistencyLevel.ONE)
+        case ConsistencyLevel.Quorum => ex.setConsistencyLevel(WriteConsistencyLevel.QUORUM)
+        case ConsistencyLevel.All => ex.setConsistencyLevel(WriteConsistencyLevel.ALL)
+      }
+      request.timeout.foreach(d => ex.setTimeout(TimeValue.timeValueMillis(d.toMillis)))
 
       implicitly[Applicative[M]].point {
-        val resp = result.get()
+        val resp = ex.execute().get()
         IndexResponse(resp.getIndex(), resp.getType(), resp.getId(), resp.getVersion(), resp.isCreated())
       }
     }

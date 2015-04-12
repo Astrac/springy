@@ -1,9 +1,46 @@
 package astrac.springy.api
 
 import astrac.springy._
+import scala.concurrent.duration.Duration
+
+sealed trait VersionType
+object VersionType {
+  case object Internal extends VersionType
+  case object External extends VersionType
+  case object ExternalGte extends VersionType
+  case object Force extends VersionType
+}
+
+sealed trait ConsistencyLevel
+object ConsistencyLevel {
+  case object One extends ConsistencyLevel
+  case object Quorum extends ConsistencyLevel
+  case object All extends ConsistencyLevel
+}
+
+sealed trait OpType
+object OpType {
+  case object Index extends OpType
+  case object Create extends OpType
+}
 
 // Document / Index API
-case class IndexRequest[T](index: String, `type`: String, id: Option[String], document: T)
+case class IndexRequest[T](
+  index: String,
+  `type`: String,
+  id: Option[String],
+  document: T,
+  ttl: Option[Long] = None,
+  opType: Option[OpType] = None,
+  parent: Option[String] = None,
+  refresh: Option[Boolean] = None,
+  routing: Option[String] = None,
+  timestamp: Option[String] = None,
+  version: Option[Long] = None,
+  versionType: Option[VersionType] = None,
+  consistencyLevel: Option[ConsistencyLevel] = None,
+  timeout: Option[Duration] = None
+)
 case class IndexResponse(_index: String, _type: String, _id: String, _version: Long, created: Boolean)
 // Document / Get API
 case class GetRequest[T](index: String, `type`: String = "_all", id: String)
