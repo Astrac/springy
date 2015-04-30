@@ -2,6 +2,8 @@ lazy val springy = project.in(file(".")).settings(
 
   name := "springy",
 
+  organization := "astrac",
+
   scalacOptions := Seq("-feature", "-deprecation"),
 
   resolvers ++= Seq(
