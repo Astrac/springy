@@ -1,6 +1,7 @@
 package astrac.springy
 
 import api._
+import testkit._
 import elasticsearch.DocumentApiSupport._
 import SprayJsonSerialization._
 import org.scalatest.{ FlatSpec, Matchers }

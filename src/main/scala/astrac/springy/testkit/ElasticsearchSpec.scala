@@ -1,5 +1,6 @@
-package astrac.springy
+package astrac.springy.testkit
 
+import astrac.springy.Executor
 import org.elasticsearch.client.transport.TransportClient
 import org.elasticsearch.common.settings.ImmutableSettings
 import org.elasticsearch.common.transport.InetSocketTransportAddress

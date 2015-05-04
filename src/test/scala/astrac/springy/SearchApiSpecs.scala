@@ -1,6 +1,7 @@
 package astrac.springy
 
 import api._
+import testkit._
 import elasticsearch.DocumentApiSupport._
 import elasticsearch.SearchApiSupport._
 import SprayJsonSerialization._

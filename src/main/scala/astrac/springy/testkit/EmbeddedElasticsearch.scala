@@ -1,4 +1,4 @@
-package astrac.springy
+package astrac.springy.testkit
 
 import java.nio.file.Files
 import org.apache.commons.io.FileUtils
