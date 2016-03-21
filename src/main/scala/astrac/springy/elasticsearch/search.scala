@@ -5,7 +5,7 @@ import astrac.springy.api._
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders
 import scala.language.higherKinds
-import scalaz.Applicative
+import cats.Applicative
 
 trait SearchSupport {
   class SearchExecutable[T: Readable] extends Executable[Executor.JavaApi, SearchRequest[T], SearchResponse[T]] {
@@ -23,7 +23,7 @@ trait SearchSupport {
         .setQuery(queryFor(request.query))
         .execute()
 
-      implicitly[Applicative[M]].point {
+      implicitly[Applicative[M]].pure {
         val resp = result.get()
         val hits = resp.getHits()
 
@@ -40,7 +40,7 @@ trait SearchSupport {
                 h.getIndex(),
                 h.getType(),
                 h.getId(),
-                implicitly[Readable[T]].fromBytes(h.getSourceRef().array()))
+                implicitly[Readable[T]].fromBytes(h.getSourceRef().array()).getOrElse(???))
             }.toList
           )
         )

@@ -4,21 +4,21 @@ import api._
 import testkit._
 import elasticsearch.DocumentApiSupport._
 import elasticsearch.SearchApiSupport._
-import SprayJsonSerialization._
+import CirceSerialization._
+import io.circe.generic.auto._
 import org.scalatest.{ FlatSpec, Matchers }
-import scalaz._
-import Scalaz._
+import cats.Id
 
-class SearchApiSpecs extends FlatSpec with ElasticsearchSpec with Protocol with Matchers {
+class SearchApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
 
   "The Search API support" should "allow issuing queries" in {
-    val sirensResp = executor.execute(IndexRequest("es_test", "book", None, Fixtures.sirensOfTitan)).to[Id]
+    val sirensResp = springy.execute(IndexRequest("es_test", "book", None, Fixtures.sirensOfTitan)).to[Id]
 
-    val protocolsResp = executor.execute(IndexRequest("es_test", "book", None, Fixtures.protocolsOfTralfamadore)).to[Id]
+    val protocolsResp = springy.execute(IndexRequest("es_test", "book", None, Fixtures.protocolsOfTralfamadore)).to[Id]
 
     commitEs()
 
-    val list = executor.execute(SearchRequest[Book]("es_test", "book", Query.MatchAll)).to[Id]
+    val list = springy.execute(SearchRequest[Book]("es_test", "book", Query.MatchAll)).to[Id]
 
     list.hits.total shouldEqual 2
     list.hits.hits.foreach { h =>

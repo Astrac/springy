@@ -1,16 +1,23 @@
 package astrac.springy
 
-import spray.json.{ JsonReader, JsonWriter, JsonParser }
+import cats.data.Xor
+import io.circe.{ Decoder, Encoder, Error }
+import io.circe.parser.decode
 
 trait Writeable[T] {
   def toBytes(doc: T): Array[Byte]
 }
 
 trait Readable[T] {
-  def fromBytes(bytes: Array[Byte]): T
+  def fromBytes(bytes: Array[Byte]): Error Xor T
 }
 
-object SprayJsonSerialization {
-  implicit def jsonWriterIsWriteable[T: JsonWriter] = new Writeable[T] { def toBytes(doc: T) = implicitly[JsonWriter[T]].write(doc).compactPrint.getBytes() }
-  implicit def jsonReaderIsReadable[T: JsonReader] = new Readable[T] { def fromBytes(bytes: Array[Byte]) = implicitly[JsonReader[T]].read(JsonParser(bytes)) }
+object CirceSerialization {
+  implicit def jsonWriterIsWriteable[T: Encoder] = new Writeable[T] {
+    def toBytes(doc: T) = implicitly[Encoder[T]].apply(doc).noSpaces.getBytes
+  }
+
+  implicit def jsonReaderIsReadable[T: Decoder] = new Readable[T] {
+    def fromBytes(bytes: Array[Byte]) = decode[T](new String(bytes))
+  }
 }

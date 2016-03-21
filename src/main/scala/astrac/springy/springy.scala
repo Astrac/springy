@@ -3,8 +3,7 @@ package astrac.springy
 import org.elasticsearch.client.Client
 import scala.concurrent.Future
 import scala.language.higherKinds
-import scalaz.Applicative
-import scalaz.Scalaz.Id
+import cats.{Applicative, Id}
 
 trait Executable[E <: Executor, Request, Response] {
   def perform[M[_]: Applicative](executor: E, request: Request): M[Response]

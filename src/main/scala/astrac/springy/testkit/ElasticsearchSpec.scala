@@ -1,9 +1,6 @@
 package astrac.springy.testkit
 
 import astrac.springy.Executor
-import org.elasticsearch.client.transport.TransportClient
-import org.elasticsearch.common.settings.ImmutableSettings
-import org.elasticsearch.common.transport.InetSocketTransportAddress
 import org.scalatest.time.Millis
 import org.scalatest.time.Span
 import org.scalatest.{ Assertions, BeforeAndAfterAll, BeforeAndAfterEach, Suite }
@@ -16,20 +13,22 @@ trait ElasticsearchSpec extends Assertions with AsyncAssertions with ScalaFuture
 
   val esPort = 12000 + (Thread.currentThread.getId % 100).toInt
 
-  var es: EmbeddedElasticsearch = _
-  var executor: Executor.JavaApi = _
+  val es: EmbeddedElasticsearch = new EmbeddedElasticsearch(esPort)
+  val springy: Executor.JavaApi = new Executor.JavaApi(es.client)
 
   def commitEs() = es.client.admin.indices.prepareRefresh().execute.actionGet
 
-  override def beforeAll() {
+  override def beforeAll(): Unit = {
     super.beforeAll()
-    es = new EmbeddedElasticsearch(esPort)
     es.start()
-
-    executor = new Executor.JavaApi(es.client)
   }
 
-  override def afterAll() {
+  override def beforeEach(): Unit = {
+    super.beforeEach()
+  }
+
+  override def afterAll(): Unit = {
+    super.afterAll()
     es.stop()
   }
 }

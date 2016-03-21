@@ -24,6 +24,19 @@ object OpType {
   case object Create extends OpType
 }
 
+// Common models
+case class AcknowledgedResponse(acknowledged: Boolean)
+
+// Index / Delete API
+case class IndexDeleteRequest(indexName: String)
+object IndexDeleteRequest {
+  val all = IndexDeleteRequest("_all")
+}
+
+// Index / Get API
+case class GetIndexRequest(indexName: String)
+case class GetIndexResponse(exists: Boolean) // TODO: Map real response
+
 // Document / Index API
 case class IndexRequest[T](
   index: String,
@@ -50,14 +63,14 @@ case class GetResponse[T](_index: String, _type: String, _id: String, _version: 
 case class DocumentUpdateRequest[T](index: String, `type`: String, id: String, document: T)
 case class UpdateResponse(_index: String, _type: String, _id: String, _version: Long)
 // Document / Delete API
-case class DeleteRequest(index: String, `type`: String, id: String)
-case class DeleteResponse(_index: String, _type: String, _id: String, _version: Long, found: Boolean)
+case class DocumentDeleteRequest(index: String, `type`: String, id: String)
+case class DocumentDeleteResponse(_index: String, _type: String, _id: String, _version: Long, found: Boolean)
 
 trait Document[E <: Executor] {
   implicit def indexSupport[T: Writeable]: Executable[E, IndexRequest[T], IndexResponse]
   implicit def getSupport[T: Readable]: Executable[E, GetRequest[T], GetResponse[T]]
   implicit def documentUpdateSupport[T: Writeable]: Executable[E, DocumentUpdateRequest[T], UpdateResponse]
-  implicit def deleteSupport: Executable[E, DeleteRequest, DeleteResponse]
+  implicit def deleteSupport: Executable[E, DocumentDeleteRequest, DocumentDeleteResponse]
 }
 
 // Search API

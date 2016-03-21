@@ -4,17 +4,16 @@ organization := "astrac"
 
 scalacOptions := Seq("-feature", "-deprecation")
 
-resolvers ++= Seq(
-  "Scalaz Bintray Repo" at "http://dl.bintray.com/scalaz/releases"
-)
+scalaVersion := "2.11.8"
 
-scalaVersion := "2.11.6"
+val circeV = "0.3.0"
 
 libraryDependencies ++= Seq(
-  "org.elasticsearch" % "elasticsearch" % "1.5.0",
-  "io.spray" %% "spray-json" % "1.3.1",
-  "org.scalaz" %% "scalaz-core" % "7.1.1",
-  "org.scalaz" %% "scalaz-effect" % "7.1.1",
+  "org.elasticsearch" % "elasticsearch" % "2.2.1",
+  "io.circe" %% "circe-core" % circeV,
+  "io.circe" %% "circe-generic" % circeV,
+  "io.circe" %% "circe-parser" % circeV,
+  "org.typelevel" %% "cats" % "0.4.1",
   "org.scalatest" %% "scalatest"     % "2.2.1",
   "org.apache.commons" % "commons-io" % "1.3.2"
 )

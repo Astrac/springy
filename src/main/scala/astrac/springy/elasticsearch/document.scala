@@ -8,7 +8,7 @@ import scala.language.higherKinds
 import org.elasticsearch.action.index.{ IndexResponse => EsIndexResponse }
 import org.elasticsearch.action.index.{ IndexRequest => EsIndexRequest }
 import org.elasticsearch.index.{ VersionType => EsVersionType }
-import scalaz.Applicative
+import cats.Applicative
 
 trait IndexSupport {
   class IndexExecutable[T: Writeable] extends Executable[Executor.JavaApi, IndexRequest[T], IndexResponse] {
@@ -42,7 +42,7 @@ trait IndexSupport {
       }
       request.timeout.foreach(d => ex.setTimeout(TimeValue.timeValueMillis(d.toMillis)))
 
-      implicitly[Applicative[M]].point {
+      implicitly[Applicative[M]].pure {
         val resp = ex.execute().get()
         IndexResponse(resp.getIndex(), resp.getType(), resp.getId(), resp.getVersion(), resp.isCreated())
       }
@@ -60,11 +60,11 @@ trait GetDocumentSupport {
         .prepareGet(request.index, request.`type`, request.id)
         .execute()
 
-      implicitly[Applicative[M]].point {
+      implicitly[Applicative[M]].pure {
         val r = result.get()
 
         GetResponse(r.getIndex(), r.getType(), r.getId(), r.getVersion(), r.isExists(),
-          if (r.isExists()) Some(implicitly[Readable[T]].fromBytes(r.getSourceAsBytes()))
+          if (r.isExists()) Some(implicitly[Readable[T]].fromBytes(r.getSourceAsBytes()).getOrElse(???))
           else None)
       }
     }
@@ -82,7 +82,7 @@ trait UpdateDocumentSupport {
         .setDoc(implicitly[Writeable[T]].toBytes(request.document))
         .execute()
 
-      implicitly[Applicative[M]].point {
+      implicitly[Applicative[M]].pure {
         val r = result.get()
 
         UpdateResponse(r.getIndex(), r.getType(), r.getId(), r.getVersion())
@@ -94,17 +94,17 @@ trait UpdateDocumentSupport {
 }
 
 trait DeleteDocumentSupport {
-  implicit val deleteSupport = new Executable[Executor.JavaApi, DeleteRequest, DeleteResponse] {
-    def perform[M[_]: Applicative](executor: Executor.JavaApi, request: DeleteRequest): M[DeleteResponse] = {
+  implicit val deleteSupport = new Executable[Executor.JavaApi, DocumentDeleteRequest, DocumentDeleteResponse] {
+    def perform[M[_]: Applicative](executor: Executor.JavaApi, request: DocumentDeleteRequest): M[DocumentDeleteResponse] = {
       val result = executor
         .client
         .prepareDelete(request.index, request.`type`, request.id)
         .execute()
 
-      implicitly[Applicative[M]].point {
+      implicitly[Applicative[M]].pure {
         val r = result.get()
 
-        DeleteResponse(r.getIndex(), r.getType(), r.getId(), r.getVersion(), r.isFound())
+        DocumentDeleteResponse(r.getIndex(), r.getType(), r.getId(), r.getVersion(), r.isFound())
       }
     }
   }

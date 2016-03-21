@@ -5,7 +5,7 @@ import org.apache.commons.io.FileUtils
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.Requests
 import org.elasticsearch.common.Priority
-import org.elasticsearch.common.settings.ImmutableSettings
+import org.elasticsearch.common.settings.Settings
 import org.elasticsearch.common.unit.TimeValue
 import org.elasticsearch.node.NodeBuilder._
 import scala.util.Random
@@ -14,7 +14,7 @@ class EmbeddedElasticsearch(port: Int) {
 
   private val clusterName = "elastic_http_" + Random.nextInt(1000)
   private val dataDir = Files.createTempDirectory("elasticsearch_data_").toFile
-  private val settings = ImmutableSettings.settingsBuilder
+  private val settings = Settings.settingsBuilder
     .put("path.data", dataDir.toString)
     .put("cluster.name", clusterName)
     .put("http.enabled", true)
