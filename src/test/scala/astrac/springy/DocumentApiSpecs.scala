@@ -61,4 +61,32 @@ class DocumentApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
     updResp._type shouldEqual "book"
     updResp._version shouldEqual 2
   }
+
+  it should "allow performing bulk operations" in {
+    def buildBulk(delId: String, updId: String) = Seq(
+      BulkRequest.indexDocument("es_test", "book", None, Fixtures.gospelFromOuterSpace),
+      BulkRequest.deleteDocument("es_test", "book", delId),
+      BulkRequest.updateDocument("es_test", "book", updId, Fixtures.slaughterhousFive)
+    )
+
+    val io = for {
+      del <- indexDocument("es_test", "book", None, Fixtures.protocolsOfTralfamadore)
+      upd <- indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
+      blk <- bulk(buildBulk(del._id, upd._id))
+      delBlk <- getDocument[Book]("es_test", "book", del._id)
+      updBlk <- getDocument[Book]("es_test", "book", upd._id)
+    } yield (blk, delBlk, updBlk)
+
+    val (blkResp, delResp, updResp) = io.foldMap(unsafeInterpreter)
+
+    blkResp.items should have size(3)
+    blkResp.items should matchPattern {
+      case Seq(_: IndexDocumentResponse, _: DeleteDocumentResponse, _: UpdateDocumentResponse) =>
+    }
+
+    delResp.found should be(false)
+    updResp.found should be(true)
+    updResp._version should equal(2)
+    updResp.document should equal(Some(Fixtures.slaughterhousFive))
+  }
 }

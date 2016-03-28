@@ -16,8 +16,9 @@ class MonadicJavaApi[M[_]: Monad](client: Client) extends (IndexIOAst ~> M) {
     case r @ DeleteIndexRequest(_) => ???
     case r @ GetDocumentRequest(_, _, _) => monad.pure(javaapi.getDocument(client, r)(r.readable))
     case r @ IndexDocumentRequest(_, _, _, _, _, _, _, _, _, _, _, _, _, _) => monad.pure(javaapi.indexDocument(client, r)(r.writeable))
-    case r @ SearchRequest(_, _, _) => monad.pure(javaapi.search(client, r)(r.readable))
     case r @ UpdateDocumentRequest(_, _, _, _) => monad.pure(javaapi.updateDocument(client, r)(r.writeable))
+    case r @ BulkRequest(_) => monad.pure(javaapi.bulk(client, r))
+    case r @ SearchRequest(_, _, _) => monad.pure(javaapi.search(client, r)(r.readable))
   }
 
 }
