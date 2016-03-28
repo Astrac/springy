@@ -1,7 +1,8 @@
-package astrac.springy.elasticsearch
+package astrac.springy
+package interpreters
+package javaapi
 
-import astrac.springy._
-import astrac.springy.api._
+import api._
 import org.elasticsearch.client.Client
 import org.elasticsearch.index.query.QueryBuilder
 import org.elasticsearch.index.query.QueryBuilders

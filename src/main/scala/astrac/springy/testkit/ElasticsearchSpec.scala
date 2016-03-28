@@ -1,6 +1,6 @@
 package astrac.springy.testkit
 
-import astrac.springy.MonadicJavaApi
+import astrac.springy.interpreters.MonadicJavaApi
 import org.elasticsearch.client.Client
 import org.scalatest.time.Millis
 import org.scalatest.time.Span

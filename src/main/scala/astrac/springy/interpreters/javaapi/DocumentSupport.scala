@@ -1,14 +1,15 @@
-package astrac.springy.elasticsearch
+package astrac.springy
+package interpreters
+package javaapi
 
-import astrac.springy._
-import astrac.springy.api._
+import api._
 import org.elasticsearch.action.WriteConsistencyLevel
 import org.elasticsearch.client.Client
 import org.elasticsearch.common.unit.TimeValue
 import org.elasticsearch.action.index.{IndexRequest => EsIndexRequest}
 import org.elasticsearch.index.{VersionType => EsVersionType}
 
-trait IndexDocumentSupport {
+trait DocumentSupport {
   def indexDocument[T: Writeable](client: Client, request: IndexDocumentRequest[T]): IndexDocumentResponse = {
     val ex = client
       .prepareIndex(request.index, request.`type`, request.id.orNull)
@@ -40,9 +41,7 @@ trait IndexDocumentSupport {
     val resp = ex.execute().get()
     IndexDocumentResponse(resp.getIndex(), resp.getType(), resp.getId(), resp.getVersion(), resp.isCreated())
   }
-}
 
-trait GetDocumentSupport {
   def getDocument[T: Readable](client: Client, request: GetDocumentRequest[T]) = {
     val r = client
       .prepareGet(request.index, request.`type`, request.id)
@@ -54,9 +53,7 @@ trait GetDocumentSupport {
       else None)
 
   }
-}
 
-trait UpdateDocumentSupport {
   def updateDocument[T: Writeable](client: Client, request: UpdateDocumentRequest[T]) = {
     val r = client
       .prepareUpdate(request.index, request.`type`, request.id)
@@ -66,9 +63,7 @@ trait UpdateDocumentSupport {
 
     UpdateDocumentResponse(r.getIndex(), r.getType(), r.getId(), r.getVersion())
   }
-}
 
-trait DeleteDocumentSupport {
   def deleteDocument(client: Client, request: DeleteDocumentRequest) = {
     val r = client
       .prepareDelete(request.index, request.`type`, request.id)
