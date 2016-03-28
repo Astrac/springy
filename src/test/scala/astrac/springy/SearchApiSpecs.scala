@@ -4,16 +4,17 @@ import api._
 import testkit._
 import CirceSerialization._
 import io.circe.generic.auto._
+import IndexIO._
 import org.scalatest.{ FlatSpec, Matchers }
 
 class SearchApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
 
   "The Search API support" should "allow issuing queries" in {
     val io = for {
-      sirens <- IndexIO.indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
-      protocols <- IndexIO.indexDocument("es_test", "book", None, Fixtures.protocolsOfTralfamadore)
+      sirens <- indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
+      protocols <- indexDocument("es_test", "book", None, Fixtures.protocolsOfTralfamadore)
       _ = commitEs()
-      list <- IndexIO.search[Book]("es_test", "book", Query.MatchAll)
+      list <- search[Book]("es_test", "book", Query.MatchAll)
     } yield (list, sirens, protocols)
 
     val (list, sirensResp, protocolsResp) = io.foldMap(unsafeInterpreter)

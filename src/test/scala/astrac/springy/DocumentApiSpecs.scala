@@ -4,14 +4,15 @@ import api._
 import testkit._
 import CirceSerialization._
 import io.circe.generic.auto._
+import IndexIO._
 import org.scalatest.{FlatSpec, Matchers}
 
 class DocumentApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
 
   "The Document API support" should "allow indexing and retrieving a document" in {
     val io = for {
-      idx <- IndexIO.indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
-      get <- IndexIO.getDocument[Book]("es_test", "book", idx._id)
+      idx <- indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
+      get <- getDocument[Book]("es_test", "book", idx._id)
     } yield (idx, get)
 
     val (idxResp, getResp) = io.foldMap(unsafeInterpreter)
@@ -31,9 +32,9 @@ class DocumentApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
 
   it should "allow indexing and deleting a document" in {
     val io = for {
-      idx <- IndexIO.indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
-      del <- IndexIO.deleteDocument("es_test", "book", idx._id)
-      get <- IndexIO.getDocument[Book]("es_test", "book", del._id)
+      idx <- indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
+      del <- deleteDocument("es_test", "book", idx._id)
+      get <- getDocument[Book]("es_test", "book", del._id)
     } yield (idx, del, get)
 
     val (idxResp, delResp, getResp) = io.foldMap(unsafeInterpreter)
@@ -49,8 +50,8 @@ class DocumentApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
 
   it should "allow indexing and updating a document" in {
     val io = for {
-      idx <- IndexIO.indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
-      upd <- IndexIO.updateDocument("es_test", "book", idx._id, Fixtures.protocolsOfTralfamadore)
+      idx <- indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
+      upd <- updateDocument("es_test", "book", idx._id, Fixtures.protocolsOfTralfamadore)
     } yield (idx, upd)
 
     val (idxResp, updResp) = io.foldMap(unsafeInterpreter)

@@ -26,10 +26,6 @@ trait ElasticsearchSpec extends Assertions with AsyncAssertions with ScalaFuture
     es.start()
   }
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-  }
-
   override def afterAll(): Unit = {
     super.afterAll()
     es.stop()
