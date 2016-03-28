@@ -1,11 +1,6 @@
 package astrac.springy
 package api
 
-import cats.Monad
-import cats.free.Free
-import language.higherKinds
-import scala.concurrent.duration.Duration
-
 // Index model
 sealed trait VersionType
 object VersionType {
@@ -52,5 +47,5 @@ case class GetDocumentResponse[T](_index: String, _type: String, _id: String, _v
 case class DeleteDocumentResponse(_index: String, _type: String, _id: String, _version: Long, found: Boolean) extends BulkItemResponse
 case class UpdateDocumentResponse(_index: String, _type: String, _id: String, _version: Long) extends BulkItemResponse
 // TODO: case class ScriptUpdateRequest[T](index: String, `type`: String, id: String, script: String, params: T)
-case class BulkResponse(items: Seq[BulkItemResponse]) 
+case class BulkResponse(items: Seq[BulkItemResponse])
 case class SearchResponse[T](_shard: ShardInfo, hits: SearchHits[T])
