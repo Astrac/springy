@@ -2,23 +2,21 @@ package astrac.springy
 
 import api._
 import testkit._
-import elasticsearch.DocumentApiSupport._
-import elasticsearch.SearchApiSupport._
 import CirceSerialization._
 import io.circe.generic.auto._
 import org.scalatest.{ FlatSpec, Matchers }
-import cats.Id
 
 class SearchApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
 
   "The Search API support" should "allow issuing queries" in {
-    val sirensResp = springy.execute(IndexRequest("es_test", "book", None, Fixtures.sirensOfTitan)).to[Id]
+    val io = for {
+      sirens <- IndexIO.indexDocument("es_test", "book", None, Fixtures.sirensOfTitan)
+      protocols <- IndexIO.indexDocument("es_test", "book", None, Fixtures.protocolsOfTralfamadore)
+      _ = commitEs()
+      list <- IndexIO.search[Book]("es_test", "book", Query.MatchAll)
+    } yield (list, sirens, protocols)
 
-    val protocolsResp = springy.execute(IndexRequest("es_test", "book", None, Fixtures.protocolsOfTralfamadore)).to[Id]
-
-    commitEs()
-
-    val list = springy.execute(SearchRequest[Book]("es_test", "book", Query.MatchAll)).to[Id]
+    val (list, sirensResp, protocolsResp) = io.foldMap(unsafeInterpreter)
 
     list.hits.total shouldEqual 2
     list.hits.hits.foreach { h =>

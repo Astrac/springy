@@ -15,11 +15,10 @@ class EmbeddedElasticsearch(port: Int) {
   private val clusterName = "elastic_http_" + Random.nextInt(1000)
   private val dataDir = Files.createTempDirectory("elasticsearch_data_").toFile
   private val settings = Settings.settingsBuilder
-    .put("path.data", dataDir.toString)
+    .put("path.home", dataDir.toString)
     .put("cluster.name", clusterName)
     .put("http.enabled", true)
     .put("http.port", port)
-    .put("index.store.type", "memory")
     .put("index.number_of_shards", 1)
     .put("index.number_of_replicas", 0)
     .put("discovery.zen.ping.multicast.enabled", false)

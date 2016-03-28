@@ -1,6 +1,9 @@
 package astrac.springy
 
-package object elasticsearch extends DocumentApiSupport {
-  implicit val documentApiSupport = DocumentApiSupport
-  implicit val searchApiSupport = SearchApiSupport
+package object elasticsearch {
+  val UnsafeClient = new IndexDocumentSupport
+      with GetDocumentSupport
+      with UpdateDocumentSupport
+      with DeleteDocumentSupport
+      with SearchSupport {}
 }
