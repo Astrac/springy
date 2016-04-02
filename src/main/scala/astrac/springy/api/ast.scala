@@ -7,10 +7,8 @@ import concurrent.duration.Duration
 sealed trait IndexIOAst[T]
 
 // Index / Delete API
+// TODO: Support IndicesOptions from ES
 case class DeleteIndexRequest(indexName: String) extends IndexIOAst[AcknowledgedResponse]
-object DeleteIndexRequest {
-  val all = DeleteIndexRequest("_all")
-}
 
 // Index / Get API
 case class GetIndexRequest(indexName: String) extends IndexIOAst[GetIndexResponse]
@@ -82,4 +80,3 @@ object BulkRequest {
 
 // Search API
 case class SearchRequest[T](index: String, `type`: String, query: Query)(implicit val readable: Readable[T]) extends IndexIOAst[SearchResponse[T]]
-

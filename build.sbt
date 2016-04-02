@@ -9,7 +9,7 @@ scalaVersion := "2.11.8"
 val circeV = "0.3.0"
 
 libraryDependencies ++= Seq(
-  "org.elasticsearch" % "elasticsearch" % "2.2.1",
+  "org.elasticsearch" % "elasticsearch" % "2.3.0",
   "io.circe" %% "circe-core" % circeV,
   "io.circe" %% "circe-generic" % circeV,
   "io.circe" %% "circe-parser" % circeV,

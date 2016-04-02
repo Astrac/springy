@@ -1,6 +1,8 @@
 package astrac.springy
 package api
 
+import org.elasticsearch.index.query.QueryBuilder
+
 // Index model
 sealed trait VersionType
 object VersionType {
@@ -26,7 +28,8 @@ object OpType {
 // Search model
 sealed trait Query
 object Query {
-  case class Term[T](field: String, value: T) extends Query
+  case class Native(query: QueryBuilder) extends Query
+  case class Term(field: String, value: String) extends Query
   case object MatchAll extends Query
   // TODO: All the other queries
 }

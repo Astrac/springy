@@ -11,6 +11,7 @@ trait SearchSupport {
   private def queryFor(q: Query): QueryBuilder = q match {
     case Query.MatchAll => QueryBuilders.matchAllQuery()
     case Query.Term(f, v) => QueryBuilders.termQuery(f, v)
+    case Query.Native(qb) => qb
   }
 
   def search[T: Readable](client: Client, request: SearchRequest[T]) = {

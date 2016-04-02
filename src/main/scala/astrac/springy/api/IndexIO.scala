@@ -3,9 +3,12 @@ package api
 
 import cats.free.Free
 import concurrent.duration.Duration
+import util.Try
 
 // Request monad
 object IndexIO {
+  // TODO: find some way to deal with exceptions happening while interpreting!
+  // e.g. not found on delete index
   type IndexIO[T] = astrac.springy.api.IndexIO[T]
 
   private def lift[R, T <: IndexIOAst[R]](v: T) = Free.liftF[IndexIOAst, R](v)
@@ -46,4 +49,10 @@ object IndexIO {
 
   def search[T: Readable](index: String, `type`: String, query: Query): IndexIO[SearchResponse[T]] =
     lift(SearchRequest[T](index, `type`, query))
+
+  // This cannot possibly work, the interpretation happens prior to the Try invocation
+  // TODO: Find a way to make it work
+  implicit class IndexIOOps[T](val io: IndexIO[T]) extends AnyVal {
+    def asTry: IndexIO[Try[T]] = io.map(Try(_))
+  }
 }
