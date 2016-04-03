@@ -3,7 +3,7 @@ package api
 
 import org.elasticsearch.index.query.QueryBuilder
 
-// Index model
+// Index document model
 sealed trait VersionType
 object VersionType {
   case object Internal extends VersionType

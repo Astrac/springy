@@ -3,6 +3,7 @@ package api
 
 import cats.data.Xor
 import concurrent.duration.Duration
+import org.elasticsearch.action.support.IndicesOptions
 import util.Try
 
 // Request AST
@@ -13,8 +14,7 @@ case class AsTry[T](io: IndexIO[T]) extends IndexIOAst[Try[T]]
 case class AsXor[T](io: IndexIO[T]) extends IndexIOAst[Throwable Xor T]
 
 // Index / Delete API
-// TODO: Support IndicesOptions from ES
-case class DeleteIndexRequest(indexName: String) extends IndexIOAst[AcknowledgedResponse]
+case class DeleteIndexRequest(indexName: String, options: Option[IndicesOptions] = None) extends IndexIOAst[AcknowledgedResponse]
 
 // Index / Get API
 case class GetIndexRequest(indexName: String) extends IndexIOAst[GetIndexResponse]

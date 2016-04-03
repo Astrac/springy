@@ -8,10 +8,12 @@ import org.elasticsearch.client.Client
 
 trait IndexSupport {
   def deleteIndex(client: Client, request: DeleteIndexRequest) = {
+    val req = new EsDeleteIndexRequest(request.indexName)
+
     val resp = client
       .admin()
       .indices()
-      .delete(new EsDeleteIndexRequest(request.indexName))
+      .delete(request.options.fold(req)(req.indicesOptions))
       .actionGet()
 
     AcknowledgedResponse(resp.isAcknowledged())

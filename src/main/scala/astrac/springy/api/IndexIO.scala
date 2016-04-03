@@ -4,6 +4,7 @@ package api
 import cats.data.Xor
 import cats.free.Free
 import concurrent.duration.Duration
+import org.elasticsearch.action.support.IndicesOptions
 import util.Try
 
 // Request monad
@@ -14,7 +15,8 @@ object IndexIO {
 
   def getIndex(indexName: String): IndexIO[GetIndexResponse] = lift(GetIndexRequest(indexName))
 
-  def deleteIndex(indexName: String): IndexIO[AcknowledgedResponse] = lift(DeleteIndexRequest(indexName))
+  def deleteIndex(indexName: String, options: Option[IndicesOptions] = None): IndexIO[AcknowledgedResponse] =
+    lift(DeleteIndexRequest(indexName, options))
 
   def indexDocument[T: Writeable](
     index: String,
@@ -57,6 +59,6 @@ object IndexIO {
 
   implicit class IndexIOOps[T](val io: IndexIO[T]) extends AnyVal {
     def asTry: IndexIO[Try[T]] = IndexIO.asTry(io)
-    def asXor: IndexIO[Try[T]] = IndexIO.asXor(io)
+    def asXor: IndexIO[Throwable Xor T] = IndexIO.asXor(io)
   }
 }
