@@ -1,10 +1,16 @@
 package astrac.springy
 package api
 
+import cats.data.Xor
 import concurrent.duration.Duration
+import util.Try
 
 // Request AST
 sealed trait IndexIOAst[T]
+
+// Exception wrappers
+case class AsTry[T](io: IndexIO[T]) extends IndexIOAst[Try[T]]
+case class AsXor[T](io: IndexIO[T]) extends IndexIOAst[Throwable Xor T]
 
 // Index / Delete API
 // TODO: Support IndicesOptions from ES
