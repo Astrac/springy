@@ -1,3 +1,5 @@
+# Springy [![Build Status](https://travis-ci.org/Astrac/springy.svg?branch=master)](https://travis-ci.org/Astrac/Springy)
+
 _springy_ is a library that attempts to provide a scala-esque way of connecting to Elasticsearch. It also serves as a personal playground for experimenting with cats and more advanced scala concepts in general. Some of the goals of the project are:
 
 * Provide a set of immutable scala models for the ES APIs in form of `*Request`/`*Response` case classes
@@ -5,12 +7,6 @@ _springy_ is a library that attempts to provide a scala-esque way of connecting 
 * Provide a test harness to enable in-process testing against real Elasticsearch instances
 * Be protocol independent and provide implementations for the Java API and for HTTP
 * Be container-independent and allow the user to select which kind of container to use for the response at call time
-
-# Project's structure
-
-_springy_ leverages the free monad to provide an AST that describes the operations that need to happen. This AST is represented via the sealed hierarchy of traits and case classes with at the topmost `IndexIOAst`; the provided DSL lifts this AST in a free monad named `IndexIO`.
-
-To run the computation you can use any mean that is valid for running free monads; provided in the implementation there is a naive `MonadicJavaApi` interpreter that uses the `pure` function of a provided monad type to wrap the lower-level invocations.
 
 # Example usage
 
@@ -59,6 +55,12 @@ getResp._id shouldEqual idxResp._id
 getResp.found shouldBe true
 getResp.document shouldEqual Some(sirensOfTitan)
 ```
+
+# Project's structure
+
+_springy_ leverages the free monad to provide an AST that describes the operations that need to happen. This AST is represented via the sealed hierarchy of traits and case classes with at the topmost `IndexIOAst`; the provided DSL lifts this AST in a free monad named `IndexIO`.
+
+To run the computation you can use any mean that is valid for running free monads; provided in the implementation there is a naive `MonadicJavaApi` interpreter that uses the `pure` function of a provided monad type to wrap the lower-level invocations.
 
 # State of the project
 
