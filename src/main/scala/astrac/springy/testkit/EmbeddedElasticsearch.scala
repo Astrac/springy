@@ -1,7 +1,8 @@
 package astrac.springy.testkit
 
-import java.nio.file.Files
-import org.apache.commons.io.FileUtils
+import java.io.{File, IOException}
+import java.nio.file.attribute.BasicFileAttributes
+import java.nio.file.{FileVisitResult, Files, Path, SimpleFileVisitor}
 import org.elasticsearch.client.Client
 import org.elasticsearch.client.Requests
 import org.elasticsearch.common.Priority
@@ -36,15 +37,31 @@ class EmbeddedElasticsearch(port: Int) {
         .timeout(TimeValue.timeValueSeconds(30))
         .waitForGreenStatus()
         .waitForEvents(Priority.LANGUID)
-        .waitForRelocatingShards(0)).actionGet
+        .waitForRelocatingShards(0)
+    ).actionGet
 
     if (actionGet.isTimedOut) sys.error("The ES cluster didn't go green within the extablished timeout")
   }
 
   def stop(): Unit = {
     node.close()
+    deleteDirectory(dataDir)
+  }
 
-    FileUtils.deleteDirectory(dataDir)
+  def deleteDirectory(dir: File): Unit = {
+    Files.walkFileTree(dir.toPath(), new SimpleFileVisitor[Path]() {
+      override def visitFile(file: Path, attrs: BasicFileAttributes): FileVisitResult = {
+        Files.delete(file)
+        FileVisitResult.CONTINUE
+      }
+
+      override def postVisitDirectory(dir: Path, exc: IOException): FileVisitResult = {
+        Files.delete(dir)
+        FileVisitResult.CONTINUE
+      }
+    })
+
+    ()
   }
 
   def createAndWaitForIndex(index: String): Unit = {
