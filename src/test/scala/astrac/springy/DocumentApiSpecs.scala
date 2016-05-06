@@ -1,10 +1,11 @@
 package astrac.springy
 
-import api._
+// import api._
+import astrac.springy.api.{ BulkRequest, DeleteDocumentResponse, IndexDocumentResponse, UpdateDocumentResponse }
 import testkit._
 import CirceSerialization._
 import io.circe.generic.auto._
-import IndexIO._
+import api.IndexIO._
 import org.scalatest.{FlatSpec, Matchers}
 
 class DocumentApiSpecs extends FlatSpec with ElasticsearchSpec with Matchers {
