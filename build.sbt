@@ -17,6 +17,4 @@ libraryDependencies ++= Seq(
   "org.scalatest" %% "scalatest"     % "2.2.6"
 )
 
-enablePlugins(GitVersioning)
-
-git.useGitDescribe := true
+version := "0.1.0"
