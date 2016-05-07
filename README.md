@@ -1,4 +1,4 @@
-# Springy [![Build Status](https://travis-ci.org/Astrac/springy.svg?branch=master)](https://travis-ci.org/Astrac/Springy)
+# Springy [![Build Status](https://travis-ci.org/Astrac/springy.svg?branch=master)](https://travis-ci.org/Astrac/springy)
 
 _springy_ is a library that attempts to provide a scala-esque way of connecting to Elasticsearch. It also serves as a personal playground for experimenting with cats and more advanced scala concepts in general. Some of the goals of the project are:
 
@@ -18,7 +18,7 @@ import astrac.springy.CirceSerialization._
 import cats.std.future._
 import io.circe.generic.auto._
 import org.elasticsearch.client.Client
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -34,7 +34,7 @@ val io = for {
 
 val client: Client = ??? // The JavaAPI elasticsearch client
 
-val unsafeInterpreter = new MonadicJavaApi[Id](client)
+val unsafeInterpreter = new MonadicJavaApi[Future](client)
 
 // Type is: Future[(IndexDocumentResponse, GetDocumentResponse[T])]
 val result = io.foldMap(unsafeInterpreter)
