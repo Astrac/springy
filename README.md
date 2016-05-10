@@ -34,10 +34,10 @@ val io = for {
 
 val client: Client = ??? // The JavaAPI elasticsearch client
 
-val unsafeInterpreter = new MonadicJavaApi[Future](client)
+val asyncInterpreter = new MonadicJavaApi[Future](client)
 
 // Type is: Future[(IndexDocumentResponse, GetDocumentResponse[T])]
-val result = io.foldMap(unsafeInterpreter)
+val result = io.foldMap(asyncInterpreter)
 
 val (idxResp, getResp) = Await.result(result, 1.seconds)
 
